@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if not session["logged_in"]: %} <!--if not logged in-->
+<div class="box">
+	<h1>FlyThru</h1>
+
+  <a href="{{ url_for('login') }}" class="btn btn-primary btn-block btn-large">Login</a>
+  <a href="{{ url_for('register') }}" class="btn btn-secondary btn-block btn-large">Register</a>
+
+</div>
+
+{% elif session["merchant_id"] == None: %} <!--if no menu items-->
+
+<div class="box">
+	<h1>FlyThru</h1>
+
+  <p>Please go to the account page to import your menu items</p>
+  <a href="{{ url_for('account') }}" class="btn btn-primary btn-block btn-large">Account</a>
+
+</div>
+
+{% else %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat_styles.css')}}">
+
+<div style="display: flex; justify-content: center; height:95%;">
+<div class="chat-container">
+    
+    <a id="mode" href="#" onclick="order()" class="btn btn-primary btn-block btn-large">Start</a>
+
+  <div class="chat" id="conversation" style="overflow-y: scroll;"></div>
+
+  <div class="user-input">
+      <button id="system-message" style="width:100%; background-color: grey;">Not Started</button>
+  </div>
+</div>
+
+<div class="chat-container">
+  <div class="chat" id="items" style="overflow-y: scroll;">
+    </div>
+    <div class="user-input">
+      <button id="amount" style="width:100%;">Total Amount: RM 0.00</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  console.log(window.location.href)
+  if(window.location.pathname == "/ordering") {
+    mode.innerHTML = "Stop";
+    document.getElementById('system-message').innerHTML = "Initializing"
+    document.getElementById('system-message').style.backgroundColor = "grey"
+    document.getElementById("conversation").innerHTML = ``
+    document.getElementById("items").innerHTML = ``
+    document.getElementById("amount").innerHTML = `Total Amount: RM 0.00`
+
+    fetch('/ready_order')
+    fetch(fetchOrderData) // Call fetchOrderData initially
+    setInterval(fetchOrderData, 1500) // Set up a timer to call fetchOrderData every second
+  }
+
+  function scrollToBottom(id) {
+    var chatContainer = document.getElementById(id);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+  
+  function order() {
+    var mode = document.getElementById('mode');
+    
+    if (mode.innerHTML == "Start") {
+      start_order();
+      mode.innerHTML = "Stop";
+    } else {
+      stop_order();
+      mode.innerHTML = "Start";
+    }
+  }
+  
+  function stop_order(){
+    window.location.href = "/end_order"
+  }
+
+  function start_order() {
+    document.getElementById('system-message').innerHTML = "Creating Order"
+    window.location.href = "/initiate_order" // jumps to /ordering
+  }
+
+  // Function to fetch the JSON data from the server
+  function fetchOrderData() {
+
+    // Make an AJAX request to your server
+    fetch('/update_display')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Received JSON data:', data);
+
+            // CONVERSATION: Iterate through the 'context' array
+            var conversation = ``;
+            for (let i = 0; i < data.context.length; i++) {
+              var role = data.context[i].role;
+              var content = data.context[i].content;
+
+              if (role === "user"){
+                conversation += `
+                <div class="message sent">
+                  <p>${content}</p>
+                  <span class="time">User</span>
+                 </div>`
+                 
+                 document.getElementById('system-message').innerHTML = "Please wait. Processing response"
+                 document.getElementById('system-message').style.backgroundColor = "grey";
+              }
+              else if (role === "assistant"){
+                conversation += `
+                <div class="message received">
+                  <p>${content}</p>
+                  <span class="time">Assistant</span>
+                 </div>`
+                 
+                 document.getElementById('system-message').innerHTML = "Please wait. Processing response"
+                 document.getElementById('system-message').style.backgroundColor = "grey";
+              }
+              else { //system listening
+                document.getElementById('system-message').innerHTML = content
+                document.getElementById('system-message').style.backgroundColor = "#007bff";
+              }
+            }
+
+            document.getElementById("conversation").innerHTML = conversation;
+            scrollToBottom("conversation");
+
+
+            // ITEMS: Iterate through the 'items' array
+            var items = ``;
+            if(data.items.length > 0){
+            for (let i = 0; i < data.items.length; i++) {
+              var itemName = data.items[i].itemName;
+              var itemPrice = data.items[i].itemPrice;
+              var customizations = data.items[i].customizations;
+              var itemAmount = data.items[i].itemAmount;
+              var totalAmount = data.totalAmount;
+              
+              items += `
+              <div class="message sent" style="justify-content: space-between;">
+                <b><p style="text-align: left; margin: 0;">${itemName}</p></b>
+                <span class="time" style="text-align: right;">${itemPrice}</span>`
+              
+              if (customizations.length != 0){
+                items += `<div id="customizations" class="message received" style="justify-content: space-between; text-align: right;">`
+              
+              for (let c=0; c < customizations.length; c++){
+                items += `
+                  <p style="text-align: left; margin: 0;"><b>${customizations[c].itemType}</b> : ${customizations[c].itemName}</p>
+                  <span class="time" style="text-align: right;">${customizations[c].price}</span>`
+              }
+
+                items += `</div>`
+              }
+
+              if (itemAmount == undefined){
+                items += `
+                <b><span class="time" style="text-align: right; color:black;">${totalAmount}</span></b>
+              </div>`
+              } else{
+              items += `
+                <b><span class="time" style="text-align: right; color:black;">${itemAmount}</span></b>
+              </div>`
+              }
+            }
+            document.getElementById("items").innerHTML = items;
+            document.getElementById("amount").innerHTML = `Total Amount: RM ${totalAmount}`;
+            }
+            scrollToBottom("items");
+        })
+        .catch(error => {
+            console.error('Error fetching JSON data:', error);
+        });
+  }
+
+  function ordering(){
+    fetch('/initiate_order')
+    .then(response => response.json())
+    .then(data => {
+        // Handle the JSON data here (update your UI, etc.)
+        console.log('Received JSON data:', data);
+    })
+    .catch(error => {
+        console.error('Error fetching JSON data:', error);
+    });
+
+    fetch(fetchOrderData) // Call fetchOrderData initially
+    setInterval(fetchOrderData, 2000) // Set up a timer to call fetchOrderData every 2 seconds (2000 milliseconds)
+  }
+</script>
+
+{% endif %}
+
+{% endblock %}

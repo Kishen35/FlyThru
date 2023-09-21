@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if not session["logged_in"]: %}
+<div class="box">
+	<h1>FlyThru</h1>
+
+  <a href="{{ url_for('login') }}" class="btn btn-primary btn-block btn-large">Login</a>
+  <a href="{{ url_for('register') }}" class="btn btn-secondary btn-block btn-large">Register</a>
+
+</div>
+
+{% else %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat_styles.css')}}">
+
+<div class="box">
+	<h1>Account Details</h1>
+    <form action="{{ url_for('updateAccount') }}" method="post">
+    	<input type="text" name="name" value="{{ session['clientName'] }}" placeholder="Name" required="required" />
+		<input disabled="true" type="email" value="{{ session['clientEmail'] }}" name="email" placeholder="Email" required="required" />
+        <input type="password" name="password" placeholder="Password" required="required" />
+        <button type="submit" class="btn btn-primary btn-block btn-large">Update Account</button>
+    </form>
+
+    <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+
+    <br><br>
+
+	<h1>Menu Import</h1>
+    <p style="color: white">Paste your merchant_id from Grab below</p>
+    <p style="color: white">Please be patient as the process will take awhile. You will be redirected to the homepage once completed</p>
+    <form action="{{ url_for('getMenu') }}" method="post">
+    	<input type="text" name="merchant_id" value="{{ session['merchant_id'] }}" placeholder="Merchant ID" required="required" />
+        {% if invalid_id == True: %}
+        <p>The merchant ID you entered is invalid, please try again</p>
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-block btn-large">Link Menu</button>
+    </form>
+
+    <a href="{{ url_for('merchant_id') }}">Click here to learn how to get your Grab merchant_id.</a>
+    <br><br>
+</div>
+
+{% endif %}
+
+{% endblock %}
