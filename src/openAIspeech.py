@@ -53,25 +53,17 @@ def updateConversation(role, message): # for user
 # Explanation of functions to OpenAI
 functionDefinitions = [
     {
-        "name": "get_menu_items",
-        "description": "Retrieves the items available in the menu seperated by comma.",
-        "parameters": {
-            "type": "object",
-            "properties": {}
-        }
-    },
-    {
         "name": "get_item_details",
         "description": "Retrieves details for the ordered item such as the price and customization options. Called only when user has chosen exactly which item they would like to order. These details do not need to be specifically elaborated to the user unless asked.",
         "parameters": {
             "type": "object",
             "properties": {
-                "itemName": {
+                "ID": {
                     "type": "string",
-                    "description": "The full name of the ordered item as obtained from the get_menu_items function."
+                    "description": "The ID of the ordered item as provided by the system."
                 }
             },
-            "required": ["itemName"],
+            "required": ["ID"],
         }
     },
     {
@@ -90,7 +82,7 @@ functionDefinitions = [
     },
     {
         "name": "update_order",
-        "description": "Update the order with all items ordered by the customer.",
+        "description": "Update the order with all items ordered by the customer. Always called whenever customer makes changes to their order.",
         "parameters": {
             "type": "object",
             "properties": {
@@ -125,7 +117,6 @@ def ask_openai():
     # function calling
     if response_message.get("function_call"):
         available_functions = {
-            "get_menu_items" : item.get_menu_items,
             "get_item_details" : item.get_item_details,
             "get_order": order.get_order,
             "update_order" : order.update_order
@@ -134,7 +125,7 @@ def ask_openai():
         function_to_call = available_functions[function_name]
         function_args = json.loads(response_message["function_call"]["arguments"])
 
-        if function_name == "get_menu_items" or function_name == "get_item_details":
+        if function_name == "get_item_details":
             function_response = function_to_call(menu_items, **function_args) # need to pass in menu_items
         else:
             function_response = function_to_call(clientEmail, **function_args)
@@ -180,11 +171,8 @@ def intialize(email, order_id):
             
             For menu items:
             - You only take orders for items available in the menu.
-            - Use the get_menu_items() function to understand all items that are available for order.
-            - The customer might use a short form when describing a menu item. For example, customer might ask for a McChicken when the closest item available is the McChicken Medium McValue Meal. Therefore, try finding the most similar item in the menu and use it's full name for the itemName parameter in the get_item_details() function.
+            - The customer might use a short form when describing a menu item.
             - If the said item is not in the menu or the customer did not specify the exact item, follow-up with options of similar items in the menu.
-            - Do not make up information about the item details or price. Instead use only item details and price that have been obtained from the get_item_details function.
-
             
             With regards to item customization:
             - You only allow customizations available for the item (obtained from the get_item_details function).
@@ -194,15 +182,15 @@ def intialize(email, order_id):
             - If the customization options have a minimum of 0, do not mention it unless asked.
 
             For item ordering:
-            - Use the get_order() function to retrieve the order details in JSON format. The total is indicated by 'totalAmount', not 'itemAmount'.
+            - Use the get_order() function to retrieve the order details in JSON format.
             - Call the update_order() function when the customer:
                 - orders an item.
                 - wants to remove an item.
                 - wants to make changes to an ordered item.
+            - Make sure that the update_order() function has already been called everytime you say you are updating the order.
             - For the 'items' parameter in the update_order() function:
-                - pass in all the ordered items details in JSON format as a string. 
-                - include the JSON of the previously ordered items as well.
-                    - This is because it will overwrite the entire list of ordered items.
+                - pass in all the customer's ordered items (including the previously ordered items) details in JSON format as a string.
+                - This is because the 'items' parameter will overwrite the entire list of ordered items.
                 - Sample Data: [{
                                 "itemName": "Burger Meal"
                                 "itemPrice": "RM 10.50"
@@ -213,9 +201,9 @@ def intialize(email, order_id):
                                     "price": "RM 0.00"
                                 },
                                 {
-                                    "itemName": "Coke"
+                                    "itemName": "Large Coke"
                                     "itemType": "Drink",
-                                    "price": "RM 0.00"
+                                    "price": "RM 2.14"
                                 }
                                 ],
                                 "itemAmount": "RM 12.64"
@@ -227,12 +215,12 @@ def intialize(email, order_id):
                                 "itemAmount": "RM 12.50"
                                 }]
             - For the 'amount' parameter in the update_order() function, pass in the sum of the 'itemAmount' for each ordered item.
+            - The total is indicated by 'totalAmount', not 'itemAmount'.
             - After updating an order, follow up with the customer if they'd like anything else. If not, tell them the total amount to be paid in front and end the conversation.
 
             Other guidelines:
             - Only give a maximum of 3 suggestions, options, or choices for menu items and customization options.
             - Keep responses as short as possible at only about 30 tokens.
-            - Provide responses in a neat format.
             """)
 
     global conversation
@@ -242,7 +230,7 @@ def intialize(email, order_id):
 loop = True
 # Continuously listens for speech input to recognize and send as text to Azure OpenAI
 def chat_with_open_ai():
-    updateContext("system", f"List of items available for order which have been seperated by comma: {item.get_menu_items(menu_items)}")
+    updateContext("system", f"List of items available for order which have been seperated by semicolon: \n {item.get_menu_items(menu_items)}")
     updateContext("system", f"order_id: {orderID}")
     updateContext("system", "Welcome to our drive-thru! How can I assist you today?")
     speech_synthesizer.speak_text_async("Welcome to our drive-thru! How can I assist you today?").get()

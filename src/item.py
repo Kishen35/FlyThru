@@ -68,16 +68,18 @@ def get_menu_items(menu_items):
     items = ""
     for category in menu_items:
         for item in category["items"]:
-            items = f'{items}, {item["name"]}'
+            items = f'{items} ID: {item["ID"]} | itemName: {item["name"]}; \n'
     return items
 
-def get_item_details(menu_items, itemName):
+# print(get_menu_items(get_items("ron@mcdonalds.com")))
+
+def get_item_details(menu_items, ID):
     details = "Item not found or incomplete item name"
 
     for category in menu_items:
         for item in category["items"]:
-            if itemName == item["name"]:
-                details = f'This item costs RM {format_price(item["priceInMinorUnit"])}\n'
+            if ID == item["ID"]:
+                details = f'The {item["name"]} costs RM {format_price(item["priceInMinorUnit"])}\n'
                 
                 try:
                     # Modifier Groups
@@ -99,6 +101,8 @@ def get_item_details(menu_items, itemName):
                     details = "Item not found"
 
     return details
+
+# print(get_item_details(get_items("ron@mcdonalds.com"), "MYITE20230721231147011597"))
 
 # def format_items(clientEmail):
 #     categories = get_items(clientEmail)
