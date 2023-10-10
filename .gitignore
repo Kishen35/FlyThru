@@ -1,4 +1,6 @@
 .vscode
 src/__pycache__
 venv
+
 FlyThru.zip
+src/config.py

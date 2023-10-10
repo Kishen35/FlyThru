@@ -7,9 +7,10 @@ import json
 
 # This example requires environment variables named "OPEN_AI_KEY" and "OPEN_AI_ENDPOINT"
 # Your endpoint should look like the following https://YOUR_OPEN_AI_RESOURCE_NAME.openai.azure.com/
-openai.api_key = '1478e1c88d94457a99a0af5a00ad6a31'
-openai.api_base =  'https://flythru-gpt.openai.azure.com/'
-openai.api_type = 'azure'
+import config
+openai.api_key = config.openAI['api_key']
+openai.api_base =  config.openAI['endpoint']
+openai.api_type = config.openAI['api_type']
 openai.api_version = '2023-07-01-preview'
 
 # This will correspond to the custom name you chose for your deployment when you deployed a model.
