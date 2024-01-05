@@ -110,6 +110,10 @@ def getMenu():
 def merchant_id():
     return send_file("templates\merchant_id.png", mimetype='image/gif')
 
+@app.route('/icon/<path:filename>')
+def icon(filename):
+    return send_from_directory(directory="../assets/favicon_io", path=filename)
+
 if __name__ == "__main__":
     app.run(debug=True)
 

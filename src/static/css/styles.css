@@ -41,6 +41,7 @@ html { width: 100%; height:100%; overflow:hidden; }
 }
 
 body {
+	overflow: auto;
 	width: 100%;
 	height:100%;
 	font-family: 'Open Sans', sans-serif;
@@ -54,10 +55,11 @@ a {
 }
 
 .box {
-	position: absolute;
-	top: 35%;
+	display: inline-table;
+	position: relative;
+	top: 5%;
 	left: 50%;
-	margin: -150px 0 0 -150px;
+	margin: -195px 0 0 -150px;
 	width:300px;
 	height:300px;
 }
