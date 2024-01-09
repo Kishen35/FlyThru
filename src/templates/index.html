@@ -22,6 +22,12 @@
 
 {% else %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/chat_styles.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animation.css')}}">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ultra&display=swap" rel="stylesheet">
 
 <div style="display: flex; justify-content: center; height:87%;">
 <div class="chat-container">
@@ -30,13 +36,21 @@
 
   <div class="chat" id="conversation" style="overflow-y: scroll;"></div>
 
-  <div class="user-input">
-      <button id="system-message" style="width:100%; background-color: grey;">Not Started</button>
+  <div id="system-response" class="user-input">
+    <div class="loading-wrapper">
+      <div class="loading">
+        <div class="dot dot1"></div>
+        <div class="dot dot2"></div>
+        <div class="dot dot3"></div>
+      </div>
+        <p style="margin-left: 10px; font-size: 17px;">loading...</p>
+      <!-- <button id="system-message" style="width:100%; background-color: grey;">Not Started</button> -->
+    </div>
   </div>
 </div>
 
 <div class="chat-container">
-  <div class="chat" id="items" style="overflow-y: scroll;">
+  <div class="chat" id="items">
     </div>
     <div class="user-input">
       <button id="amount" style="width:100%;">Total Amount: RM 0.00</button>
@@ -45,11 +59,43 @@
 </div>
 
 <script>
+  function iconLoading(){
+  return `
+    <div class="loading-wrapper">
+      <div class="loading">
+        <div class="dot dot1"></div>
+        <div class="dot dot2"></div>
+        <div class="dot dot3"></div>
+      </div>
+        <p style="margin-left: 10px; font-size: 17px;">loading...</p>
+    </div>
+  `
+  }
+  
+  function iconMicrophone(){
+    return `
+      <div class="loading-wrapper">
+        <div style="
+        margin-inline: 20px;
+        display: flex;
+        justify-content: center;
+        ">
+          <div class="pulse-ring"></div>
+          <i class="fa fa-microphone" aria-hidden="true"></i>
+        </div>
+        
+        <p style="margin-left: 10px; font-size: 17px;">Listening: Please speak into the microphone.</p>
+      </div>
+    `
+  }
+  
   console.log(window.location.href)
   if(window.location.pathname == "/ordering") {
     mode.innerHTML = "Stop";
-    document.getElementById('system-message').innerHTML = "Initializing"
-    document.getElementById('system-message').style.backgroundColor = "grey"
+    // document.getElementById('system-message').innerHTML = "Initializing"
+    // document.getElementById('system-message').style.backgroundColor = "grey"
+    document.getElementById('system-response').innerHTML = iconLoading()
+
     document.getElementById("conversation").innerHTML = ``
     document.getElementById("items").innerHTML = ``
     document.getElementById("amount").innerHTML = `Total Amount: RM 0.00`
@@ -81,7 +127,8 @@
   }
 
   function start_order() {
-    document.getElementById('system-message').innerHTML = "Creating Order"
+    // document.getElementById('system-message').innerHTML = "Creating Order"
+    document.getElementById('system-response').innerHTML = iconLoading();
     window.location.href = "/initiate_order" // jumps to /ordering
   }
 
@@ -102,27 +149,46 @@
 
               if (role === "user"){
                 conversation += `
-                <div class="message sent">
-                  <p>${content}</p>
-                  <span class="time">User</span>
-                 </div>`
+                <div class = "chat-blob">
+                  <svg width="6%" height="40" style = "margin-top: 10px" >
+                    <g filter="url(#filter0_d_133_30)">
+                      <circle cx="20" cy="20" r="18" fill="white" stroke="#061C29" stroke-width="2"/>
+                      <image href="/icon/person_google.png" width="20" x=10 y=10 />
+                    </g>
+                  </svg>
+                
+                  <div class="message sent">
+                    <p>${content}</p>
+                  </div>
+                </div>`
                  
-                 document.getElementById('system-message').innerHTML = "Please wait. Processing response"
-                 document.getElementById('system-message').style.backgroundColor = "grey";
+                 // document.getElementById('system-message').innerHTML = "Please wait. Processing response"
+                 // document.getElementById('system-message').style.backgroundColor = "grey";
+                 document.getElementById('system-response').innerHTML = iconLoading();
               }
               else if (role === "assistant"){
                 conversation += `
-                <div class="message received">
-                  <p>${content}</p>
-                  <span class="time">Assistant</span>
-                 </div>`
+                <div class = "chat-blob">
+                  <svg width="6%" height="40" style = "margin-top: 10px" >
+                    <g>
+                      <circle cx="20" cy="20" r="20" fill="#061C29"/>
+                      <image href="/icon/icons8-chatbot-24.png" width="20" x=10 y=10 />
+                    </g>
+                  </svg>
+
+                  <div class="message received">
+                    <p>${content}</p>
+                  </div>
+                </div>`
                  
-                 document.getElementById('system-message').innerHTML = "Please wait. Processing response"
-                 document.getElementById('system-message').style.backgroundColor = "grey";
+                 // document.getElementById('system-message').innerHTML = "Please wait. Processing response"
+                 // document.getElementById('system-message').style.backgroundColor = "grey";
+                 document.getElementById('system-response').innerHTML = iconLoading();
               }
               else { //system listening
-                document.getElementById('system-message').innerHTML = content
-                document.getElementById('system-message').style.backgroundColor = "#007bff";
+                // document.getElementById('system-message').innerHTML = content
+                // document.getElementById('system-message').style.backgroundColor = "#007bff";
+                document.getElementById('system-response').innerHTML = iconMicrophone();
               }
             }
 
@@ -140,18 +206,30 @@
               var itemAmount = data.items[i].itemAmount;
               var totalAmount = data.totalAmount;
               
+              // TODO: add quantity
               items += `
-              <div class="message sent" style="justify-content: space-between;">
-                <b><p style="text-align: left; margin: 0;">${itemName}</p></b>
-                <span class="time" style="text-align: right;">${itemPrice}</span>`
+              <div class = "chat-blob">
+                <svg width="6%" height="40" style = "align-self: center" >
+                  <g>
+                    <circle cx="20" cy="20" r="20" fill="#992800"/>
+                    <text style="font-size:16px; font-family: 'Ultra', serif;" fill="white" x="20" y="21.27" dominant-baseline="middle" text-anchor="middle">1</text>
+                  </g>
+                </svg>
+
+                <img src="/icon/apple-touch-icon.png">
+                <div class="message sent" style="justify-content: space-between; width: 74%">
+                  <b><p style="text-align: left; margin: 0;">${itemName}</p></b>
+                  <b><span class="time" style="text-align: right; display:block">${itemPrice}</span></b>`
               
               if (customizations.length != 0){
-                items += `<div id="customizations" class="message received" style="justify-content: space-between; text-align: right;">`
+                items += `<div id="customizations" style="justify-content: space-between; text-align: right;">`
               
               for (let c=0; c < customizations.length; c++){
                 items += `
-                  <p style="text-align: left; margin: 0;"><b>${customizations[c].itemType}</b> : ${customizations[c].itemName}</p>
-                  <span class="time" style="text-align: right;">${customizations[c].price}</span>`
+                  <div class="customizations">
+                    <p style="margin: 0;"><b>${customizations[c].itemType}</b> : ${customizations[c].itemName}</p>
+                    <span class="time" style="text-align: right;">${customizations[c].price}</span>
+                  </div>`
               }
 
                 items += `</div>`
@@ -159,12 +237,14 @@
 
               if (itemAmount == undefined){
                 items += `
-                <b><span class="time" style="text-align: right; color:black;">${totalAmount}</span></b>
-              </div>`
+                <b><span class="time" style="text-align: right; color:black; display:block; margin-top: 10px; font-size: 16px;">${totalAmount}</span></b>
+              </div>
+            </div>`
               } else{
               items += `
-                <b><span class="time" style="text-align: right; color:black;">${itemAmount}</span></b>
-              </div>`
+                <b><span class="time" style="text-align: right; color:black; display:block; margin-top: 10px; font-size: 16px;">${itemAmount}</span></b>
+              </div>
+            </div>`
               }
             }
             document.getElementById("items").innerHTML = items;

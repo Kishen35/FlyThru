@@ -1,13 +1,10 @@
 @import url(https://fonts.googleapis.com/css2?family=Viga&display=swap);
+@import url(https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500&display=swap);
 
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     margin: 0;
     padding: 0;
-}
-
-p {
-    color: black;
 }
 
 .chat-container {
@@ -17,8 +14,9 @@ p {
     margin-inline: 20px;
     background-color: #f2f2f2;
     border-radius: 10px;
-	border: 2px solid #000;
+    border: 2px solid #000;
     padding: 20px;
+    position: relative;
 }
 
 .chat {
@@ -26,20 +24,39 @@ p {
     max-height: 84%;
 }
 
+.chat-blob {
+    display: flex;
+}
+
 .message {
-    padding: 10px;
+    width: 94%;
+    padding: 22px;
     margin: 10px;
-    border-radius: 5px;
+    border-radius: 14px;
+    border: 2px solid #000;
+}
+
+img {
+    border-radius: 14px;
+    border: 2px solid #000;
+    width: 20%;
+    height: 60%;
+    align-self: center;
+    margin-left: 10px;
+}
+
+p {
+    margin-bottom: 0;;
 }
 
 .received {
-    text-align: left;
-    background-color: #fff;
+    background-color: #061C29;
+    color: #ffffff;
 }
 
 .sent {
-    text-align: right;
-    background-color: #d4f4ff;
+    background-color: #ffffff;
+    color: #1B2559;
 }
 
 .time {
@@ -47,9 +64,21 @@ p {
     font-size: 12px;
 }
 
+.customizations {
+    display: inline-flex;
+    text-align: left;
+    width: 100%;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
 .user-input {
     display: flex;
-    margin-top: 20px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 20px;
 }
 
 input[type="text"] {
