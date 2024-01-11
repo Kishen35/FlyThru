@@ -146,6 +146,7 @@
             for (let i = 0; i < data.context.length; i++) {
               var role = data.context[i].role;
               var content = data.context[i].content;
+              content = content.replace(/\n/g, "<br>") // replace to new line
 
               if (role === "user"){
                 conversation += `
