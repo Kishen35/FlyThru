@@ -80,6 +80,7 @@ def get_item_details(menu_items, ID):
         for item in category["items"]:
             if ID == item["ID"]:
                 details = f'The {item["name"]} costs RM {format_price(item["priceInMinorUnit"])}\n'
+                details = f'{details}The image link for this item is: ({item["imgHref"]})\n'
                 
                 try:
                     # Modifier Groups

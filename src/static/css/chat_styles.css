@@ -36,6 +36,10 @@ body {
     border: 2px solid #000;
 }
 
+#system-message {
+    display: none;
+}
+
 img {
     border-radius: 14px;
     border: 2px solid #000;

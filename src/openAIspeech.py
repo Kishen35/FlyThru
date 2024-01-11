@@ -195,6 +195,8 @@ def intialize(email, order_id):
                 - Sample Data: [{
                                 "itemName": "Burger Meal"
                                 "itemPrice": "RM 10.50"
+                                "quantity": "1"
+                                "imgHref": "https://cloudfront.net/d66e676d_TPO9983.webp"
                                 "customizations": [
                                 {
                                     "itemName": "Fries",
@@ -212,10 +214,12 @@ def intialize(email, order_id):
                                 {
                                 "itemName": "Iced Latte"
                                 "itemPrice": "RM 12.50"
+                                "quantity": "2"
+                                "imgHref": "https://cloudfront.net/sa6sa88s9_TPO3288.webp"
                                 "customizations": [],
-                                "itemAmount": "RM 12.50"
+                                "itemAmount": "RM 25.00"
                                 }]
-            - For the 'amount' parameter in the update_order() function, pass in the sum of the 'itemAmount' for each ordered item.
+            - For the 'amount' parameter in the update_order() function, always pass in the sum of the 'itemAmount' for each ordered item.
             - The total is indicated by 'totalAmount', not 'itemAmount'.
             - After updating an order, follow up with the customer if they'd like anything else. If not, tell them the total amount to be paid in front and end the conversation.
 
