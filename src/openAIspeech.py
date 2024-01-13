@@ -11,7 +11,7 @@ import config
 openai.api_key = config.openAI['api_key']
 openai.api_base =  config.openAI['endpoint']
 openai.api_type = config.openAI['api_type']
-openai.api_version = '2023-07-01-preview'
+openai.api_version = '2023-12-01-preview'
 
 # This will correspond to the custom name you chose for your deployment when you deployed a model.
 deployment_id='flythru-ai' 
