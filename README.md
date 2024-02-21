@@ -15,6 +15,8 @@ pip install -r requirements.txt
 ### 2. Resource Creation
 FlyThru relies on three main resources which are Azure Speech Service, Azure OpenAI, and Azure CosmosDB.
 
+Azure OpenAI needs to have a gpt model (existing version runs on gpt-35-turbo-16k for more tokens) deployed under the name `flythru-ai`.
+
 Azure Cosmos DB needs to have three containers [`client`, `item`, `order`] with `clientEmail` as the partition key and `id` as the primary key for each.
 
 Once these resources have been created, the secrets are to be stored in a `config.py` file.
@@ -32,6 +34,11 @@ openAI = {
     'endpoint': os.environ.get('OPENAI_LINK', '<YOUR_OPENAI_ENDPOINT>'),
     'api_key': os.environ.get('OPENAI_API', '<YOUR_OPENAI_KEY>'),
     'api_type': os.environ.get('GPT_PROVIDER', 'azure') # can be openai if using OpenAI's API directly
+}
+
+speech = {
+    'subscription': os.environ.get('SPEECH_SUBSCRIPTION', '<YOUR_SPEECH_SUBSCRIPTION_KEY>'),
+    'region': os.environ.get('SPEECH_REGION', '<YOUR_SPEECH_REGION>'),
 }
 ```
 

@@ -17,7 +17,7 @@ openai.api_version = '2023-12-01-preview'
 deployment_id='flythru-ai' 
 
 # This example requires environment variables named "SPEECH_KEY" and "SPEECH_REGION"
-speech_config = speechsdk.SpeechConfig(subscription='62013dae4b9148fd86bf1629683eb86d', region='southeastasia')
+speech_config = speechsdk.SpeechConfig(config.speech['subscription'], config.speech['region'])
 audio_output_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
 audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
 
