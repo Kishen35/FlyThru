@@ -7,6 +7,31 @@ import numpy as np
 import imutils
 import cv2
 
+def capture_frame():
+    VehicleVideo = cv2.VideoCapture(config.vision['camera'])
+
+    if not VehicleVideo.isOpened():
+        print("Error: Couldn't open the webcam.")
+        return None
+
+    # Capture a frame
+    ret, frame = VehicleVideo.read()
+
+    # Release the webcam
+    VehicleVideo.release()
+
+    if not ret:
+        print("Error: Couldn't capture a frame.")
+        return None
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Convert the NumPy array to bytes
+    _, img_crop_data = cv2.imencode('.jpg', frame)
+    img_crop_bytes = img_crop_data.tobytes()
+
+    return img_crop_bytes
+
+
 """
     Set these two environment variables before running the sample:
     1) VISION_ENDPOINT - Your endpoint URL, in the form https://your-resource-name.cognitiveservices.azure.com

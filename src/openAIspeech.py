@@ -5,6 +5,9 @@ import openai
 import item, order # item.py
 import json
 
+import vision # vision.py
+from flask import session, jsonify
+
 # This example requires environment variables named "OPEN_AI_KEY" and "OPEN_AI_ENDPOINT"
 # Your endpoint should look like the following https://YOUR_OPEN_AI_RESOURCE_NAME.openai.azure.com/
 import config
@@ -272,6 +275,13 @@ def chat_with_open_ai():
                 updateConversation("system", "Speech Recognition canceled")
                 if cancellation_details.reason == speechsdk.CancellationReason.Error:
                     print("Error details: {}".format(cancellation_details.error_details))
+
+            if session['vision'] == True:
+                # Check if there are any vehicles in front of the drive-thru
+                if vision.vehicle_detection(vision.capture_frame()) != 1:
+                    order.stop_order(session['clientEmail'], session['order_id'])
+                    return jsonify({'id': 0})  # no vehicles
+
         except EOFError:
             break
         except Exception as e:

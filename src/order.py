@@ -26,7 +26,9 @@ def create_order(clientEmail):
         'clientEmail': clientEmail,
         'items' : [],
         "totalAmount": 0,
-        "context": []
+        "context": [],
+        "plateNumber": None,
+        "stop_order": 0
     }
 
     try:
@@ -64,3 +66,15 @@ def update_order(clientEmail, order_id, items, amount):
     print(response)
 
     return 'Replaced Item\'s Id is {0}'.format(response['id'])
+
+def update_plateNumber(clientEmail, order_id, plateNumber):
+    read_item = container.read_item(item=order_id, partition_key=clientEmail)
+    read_item["plateNumber"] = plateNumber
+
+    response = container.replace_item(item=read_item, body=read_item)
+
+def stop_order(clientEmail, order_id):
+    read_item = container.read_item(item=order_id, partition_key=clientEmail)
+    read_item["stop_order"] = 1
+
+    response = container.replace_item(item=read_item, body=read_item)

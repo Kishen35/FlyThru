@@ -24,11 +24,11 @@
 
     <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
 
-    <br><br>
+    <br>
 
 	<h1>Menu Import</h1>
     <p style="color: #061C29">Paste your merchant_id from Grab below</p>
-    <p style="color: #061C29">Please be patient as the process will take awhile. You will be redirected to the homepage once completed</p>
+    <p style="color: #061C29">Please be patient as the process will take a while. You will be redirected to the homepage once completed</p>
     <form action="{{ url_for('getMenu') }}" method="post">
     	<input type="text" name="merchant_id" value="{{ session['merchant_id'] }}" placeholder="Merchant ID" required="required" />
         {% if invalid_id == True: %}
@@ -38,8 +38,29 @@
     </form>
 
     <a href="{{ url_for('merchant_id') }}">Click here to learn how to get your Grab merchant_id.</a>
-    <br><br>
+    <br><br><br>
+
+    <div style="display: flex;width: max-content;">
+        <h1>FlyThru Vision</h1>
+
+        <!-- Rounded switch -->
+        <form id="updateVision" action="{{ url_for('vision_ai') }}" method="post">
+            <label class="switch" id="visionSwitch">
+                <input type="checkbox" name="vision" {% if session["vision"] == True: %} checked {% endif %} onchange="submitForm()">
+                <span class="slider round"></span
+            </label>
+        </form>
+        
+            <input type="hidden" name="vision" value="false">
+        </form>
+    </div>
 </div>
+
+<script>
+    function submitForm() {
+        document.getElementById('updateVision').submit();
+    }
+</script>
 
 {% endif %}
 

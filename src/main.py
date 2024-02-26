@@ -1,7 +1,8 @@
 import client # client.py
 import item # item.py
 import order # order.py
-import openAIspeech
+import openAIspeech # openAIspeech.py
+import vision # vision.py
 
 import time
 from flask import Flask, render_template, request, url_for, redirect, session, send_file, flash, send_from_directory, jsonify
@@ -13,22 +14,30 @@ app.config['SECRET_KEY'] = 'flythru'
 
 @app.route('/', methods=["GET", "POST"])
 def home():
+    session['order_id'] = None
     return render_template("index.html")
 
 @app.route('/initiate_order')
 def initiate_order():
     # create order id and ready system for order taking
     session['order_id'] = order.create_order(session['clientEmail'])
-    openAIspeech.intialize(session['clientEmail'], session['order_id'])
+    openAIspeech.intialize(session['clientEmail'], session['order_id'])        
     return redirect(url_for("ordering"))
     
 @app.route('/ordering')
 def ordering():
+    if session['vision']:
+        try: # get license plate
+            session['plate_number'] = vision.plate_ocr(vision.capture_frame())
+            order.update_plateNumber(session['clientEmail'], session['order_id'], session['plate_number'])
+        except:
+            session['plate_number'] = None
+
     return render_template("index.html")
 
 @app.route('/ready_order')
 def ready_order():
-    openAIspeech.chat_with_open_ai()
+    return openAIspeech.chat_with_open_ai()
 
 @app.route('/end_order')
 def end_order():
@@ -69,12 +78,15 @@ def login():
             session['clientEmail'] = email
             session['clientName'] = login.get("clientName") # function returns name
             session['merchant_id'] = login.get("merchant_id") # function returns id
+            session['vision'] = False
+            session['plate_number'] = None
             return redirect(url_for("home"))
         else:
             return render_template("login.html", not_found=True)
         
     return render_template("login.html")
 
+# account.html
 @app.route('/account')
 def account():
     return render_template("account.html")
@@ -86,12 +98,35 @@ def updateAccount():
     client.update_account(session['clientEmail'], password, name)
     return redirect(url_for("logout"))
 
+@app.route('/vision', methods=["GET", "POST"])
+def vision_ai():
+    if request.method == "POST":
+        if request.form.get('vision') == "on":
+            session['vision'] = True
+        else:
+            session['vision'] = False
+
+        print(session['vision'])
+        return redirect(url_for("end_order"))
+
+
+    print(session['order_id'])
+    if request.method == "GET" and session['order_id'] == None:
+        frame = vision.capture_frame()
+        result = vision.vehicle_detection(frame)
+
+        # Return the number as JSON
+        return jsonify({'result': result})
+
+
 @app.route('/logout')
 def logout():
     session.pop("logged_in", None)
     session.pop("clientEmail", None)
     session.pop("clientName", None)
     session.pop("merchant_id", None)
+    session.pop("vision", None)
+    session.pop("plate_number", None)
     return redirect(url_for("home"))
 
 

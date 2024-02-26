@@ -32,9 +32,16 @@
 <div style="display: flex; justify-content: center; height:87%;">
 <div class="chat-container">
     
-    <a id="mode" href="#" onclick="order()" class="btn btn-primary btn-block btn-large">Start</a>
+    <!-- manual mode -->
+    <a id="mode" href="#" onclick="order()" class="btn btn-primary btn-block btn-large" {% if session["vision"] == True: %} style="display: none;" {% endif %}>Start</a>
+  
+  {% if session["vision"]: %}
+    <div class="message sent" style="height: min-content; width: max-content; padding-block: initial; float: inline-end;">
+      <b><p id="license-plate">NO VEHICLE DETECTED</p></b>
+    </div>
+  {% endif %}
 
-  <div class="chat" id="conversation" style="overflow-y: scroll;"></div>
+  <div class="chat" id="conversation" style="overflow-y: scroll; width: 100%;"></div>
 
   <div id="system-response" class="user-input">
     <!-- <div class="loading-wrapper">
@@ -89,6 +96,31 @@
     `
   }
   
+  var vision = "{{ session['vision'] }}";
+  if (window.location.pathname === '/' && vision == "True") {
+      checkVehicle();
+  }
+
+  async function checkVehicle (){
+    var vehicle_detected = 0;
+    
+    await fetch('/vision')
+    .then(response => response.json())
+    .then(data => {
+      console.log('Received JSON data:', data);
+      vehicle_detected = data.result;
+    })
+
+    if (vehicle_detected != 0){ // if vehicle detected, start order
+      await start_order();
+      await clearTimeout(vehicleCheck);
+    }
+
+    setTimeout(() => {
+      checkVehicle();
+    }, 1500); // 1500 milliseconds = 1.5 seconds
+  }
+
   console.log(window.location.href)
   if(window.location.pathname == "/ordering") {
     mode.innerHTML = "Stop";
@@ -140,6 +172,16 @@
         .then(response => response.json())
         .then(data => {
             console.log('Received JSON data:', data);
+
+            if (vision == "True"){
+              // If Order Cancelled
+              if (data.stop_order == 1){
+                window.location.href = '/end_order';
+              }
+              
+              // PLATE NUMBER
+              document.getElementById('license-plate').innerHTML = data.plateNumber
+            }
 
             // CONVERSATION: Iterate through the 'context' array
             var conversation = ``;
