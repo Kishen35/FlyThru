@@ -1,9 +1,25 @@
 # FlyThru: Automated Drive-Thru Ordering System
-Learn More: 
 
-[Slides on Canva](https://www.canva.com/design/DAFwGzPJbH8/RnbRAqfv8rEJAwqB4wbGJw/view)
-//
-[Pitch Video](https://cloudmails-my.sharepoint.com/:v:/g/personal/tp055296_mail_apu_edu_my/EROObqn2ImROp5gpdPhCWN0B-Csk8qexEClBWhuxtOdDqQ?e=1tgtoy&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZyIsInJlZmVycmFsQXBwUGxhdGZvcm0iOiJXZWIiLCJyZWZlcnJhbE1vZGUiOiJ2aWV3In19) 
+## Vision Enhancement Preview
+
+
+
+https://github.com/user-attachments/assets/2282d614-effc-4e49-8d36-7b10041d23f8
+
+
+
+
+
+
+
+
+Learn More: Check out the [Slides on Canva](https://www.canva.com/design/DAFwGzPJbH8/RnbRAqfv8rEJAwqB4wbGJw/view) or watch the Pitch Video below (note that the interface is slightly outdated)
+
+
+
+https://github.com/user-attachments/assets/c4b4ce71-3f7a-4790-9e48-4570499d6fa9
+
+
 
 ![FlyThru Poster](https://github.com/Kishen35/FlyThru/blob/FYP/assets/FlyThru.png)
 
@@ -50,6 +66,3 @@ speech = {
 5. Click on "Start Order" to begin taking an order
 6. Speak into the microphone when the action bar turns blue
 7. Once order completed, click on "Stop Order"
-
-## Preview
-![Screenshot](https://github.com/Kishen35/FlyThru/blob/FYP/assets/FlyThru%20interface.png)
